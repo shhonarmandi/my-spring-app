@@ -15,8 +15,12 @@ public class DemoApplication {
     @RestController
     class HelloController {
         @GetMapping("/hello")
-        public String hello(@RequestParam(defaultValue = "World") String name) {
-            return "Hello, " + name + " \uD83D\uDC4B!";
+        public HelloResponse hello(@RequestParam(required = false) String name) {
+            if (name == null || name.trim().isEmpty()) {
+                throw new IllegalArgumentException("Required parameter 'name' is not present.");
+            }
+
+            return new HelloResponse("Hello, " + name + " \uD83D\uDC4B!");
         }
     }
 }
