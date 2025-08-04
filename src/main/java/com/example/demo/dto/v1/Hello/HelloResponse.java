@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.dto.v1.Hello;
 
 public class HelloResponse {
     private String message;
