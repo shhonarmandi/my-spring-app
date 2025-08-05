@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 class HelloController {
 
-    @GetMapping("/v1/hello")
-    public HelloResponse hello(@RequestParam(required = false) String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Name is required");
-        }
-
-        return new HelloResponse("Hello, " + name + " \uD83D\uDC4B!");
+  @GetMapping("/v1/hello")
+  public HelloResponse hello(@RequestParam(required = false) String name) {
+    if (name == null || name.trim().isEmpty()) {
+      throw new IllegalArgumentException("name is required");
     }
+
+    return new HelloResponse("Hello, " + name + " \uD83D\uDC4B!");
+  }
 }

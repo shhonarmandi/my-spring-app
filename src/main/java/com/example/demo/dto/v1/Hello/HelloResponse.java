@@ -1,19 +1,13 @@
 package com.example.demo.dto.v1.Hello;
 
 public class HelloResponse {
-    private String message;
-    private long timestamp;
+  private String message;
 
-    public HelloResponse(String message) {
-        this.message = message;
-        this.timestamp = System.currentTimeMillis();
-    }
+  public HelloResponse(String message) {
+    this.message = message;
+  }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
+  public String getMessage() {
+    return message;
+  }
 }

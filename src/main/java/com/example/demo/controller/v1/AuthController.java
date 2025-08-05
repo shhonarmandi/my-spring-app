@@ -1,30 +1,34 @@
 package com.example.demo.controller.v1;
 
+import com.example.demo.dto.ApiResponse;
 import com.example.demo.dto.v1.Auth.AuthRequest;
 import com.example.demo.dto.v1.Auth.AuthResponse;
 import com.example.demo.service.v1.AuthService;
+import com.example.demo.util.ResponseUtil;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class AuthController {
-    private final AuthService authService;
+  private final AuthService authService;
 
-    public AuthController(AuthService authService) {
-        this.authService = authService;
+  public AuthController(AuthService authService) {
+    this.authService = authService;
+  }
+
+  @PostMapping("/v1/login")
+  public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody AuthRequest request) {
+    var isAuthorized = authService.login(request);
+
+    if (isAuthorized) {
+      return ResponseUtil.success("login successful");
+    } else {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid credentials");
     }
-
-    @PostMapping("/v1/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
-        AuthResponse response = authService.login(request);
-
-        if (response.isSuccess()) {
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.status(401).body(response);
-        }
-    }
+  }
 }
