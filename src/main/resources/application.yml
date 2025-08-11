@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: demo
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+jwt:
+  # Read from env at runtime. No secret in Git!
+  secret: ${JWT_SECRET}
+  expiration-ms: 900000  # 15 minutes

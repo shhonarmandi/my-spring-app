@@ -24,6 +24,6 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody AuthRequest request) {
     var response = authService.login(request);
-    return ResponseUtil.success("login successful", response);
+    return ResponseUtil.success(response);
   }
 }

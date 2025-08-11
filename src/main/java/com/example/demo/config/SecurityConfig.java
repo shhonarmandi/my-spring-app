@@ -1,6 +1,7 @@
 package com.example.demo.config;
 
 import com.example.demo.security.JwtAuthenticationFilter;
+import com.example.demo.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,10 +11,20 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.time.Instant;
+
 @Configuration
 public class SecurityConfig {
+
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtil jwtUtil) {
+    return new JwtAuthenticationFilter(jwtUtil);
+  }
+
+  @Bean
+  public SecurityFilterChain filterChain(
+      HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+
     http
         // Disable CSRF (only for stateless APIs)
         .csrf(AbstractHttpConfigurer::disable)
@@ -25,7 +36,7 @@ public class SecurityConfig {
             auth -> auth.requestMatchers("/v1/login").permitAll().anyRequest().authenticated())
 
         // Detect token in header and set Spring SecurityContextHolder
-        .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
         // Root level security filters exception handlers - runs before MvcExceptionHandler
         .exceptionHandling(
@@ -34,13 +45,13 @@ public class SecurityConfig {
                         (req, res, e) -> {
                           res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                           res.setContentType("application/json");
-                          res.getWriter().write("{\"status\":401,\"message\":\"unauthorized\"}");
+                          res.getWriter().write(generateErrorResponse("unauthorized"));
                         })
                     .accessDeniedHandler(
                         (req, res, e) -> {
                           res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                           res.setContentType("application/json");
-                          res.getWriter().write("{\"status\":403,\"message\":\"forbidden\"}");
+                          res.getWriter().write(generateErrorResponse("forbidden"));
                         }))
 
         // Other configuration to stay with stateless approach
@@ -50,8 +61,11 @@ public class SecurityConfig {
     return http.build();
   }
 
-  @Bean
-  public JwtAuthenticationFilter jwtAuthenticationFilter() {
-    return new JwtAuthenticationFilter();
+  private String generateErrorResponse(String message) {
+    return "{\"status\":\"error\",\"message\":\""
+        + message
+        + "\",\"timestamp\":\""
+        + Instant.now().toString()
+        + "\"}";
   }
 }
