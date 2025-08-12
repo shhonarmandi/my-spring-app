@@ -6,11 +6,14 @@ import com.example.demo.dto.v1.Auth.AuthResponse;
 import com.example.demo.service.v1.AuthService;
 import com.example.demo.util.ResponseUtil;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/v1")
@@ -24,6 +27,16 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody AuthRequest request) {
     var response = authService.login(request);
-    return ResponseUtil.success(response);
+
+    var refreshCookie =
+        ResponseCookie.from("refresh_token", response.getRefreshToken())
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Strict")
+            .path("/v1/refresh")
+            .maxAge(Duration.ofDays(30))
+            .build();
+
+    return ResponseUtil.success(response, refreshCookie);
   }
 }

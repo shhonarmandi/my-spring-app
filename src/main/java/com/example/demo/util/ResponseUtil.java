@@ -1,9 +1,7 @@
 package com.example.demo.util;
 
 import com.example.demo.dto.ApiResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 
 public class ResponseUtil {
   public static <T> ResponseEntity<ApiResponse<T>> success() {
@@ -12,6 +10,16 @@ public class ResponseUtil {
 
   public static <T> ResponseEntity<ApiResponse<T>> success(T data) {
     return ResponseEntity.ok(new ApiResponse<>("success", data));
+  }
+
+  public static <T> ResponseEntity<ApiResponse<T>> success(T data, ResponseCookie... cookies) {
+    var builder = ResponseEntity.ok();
+
+    for (var cookie : cookies) {
+      builder.header(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    return builder.body(new ApiResponse<>("success", data));
   }
 
   public static <T> ResponseEntity<ApiResponse<T>> error(
