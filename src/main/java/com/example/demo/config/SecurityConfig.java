@@ -33,7 +33,11 @@ public class SecurityConfig {
 
         // Detect if endpoint is public or protected
         .authorizeHttpRequests(
-            auth -> auth.requestMatchers("/v1/login").permitAll().anyRequest().authenticated())
+            auth ->
+                auth.requestMatchers("/v1/login", "/v1/refresh")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
 
         // Detect token in header and set Spring SecurityContextHolder
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

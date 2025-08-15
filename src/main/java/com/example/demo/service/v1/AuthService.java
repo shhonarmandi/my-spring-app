@@ -32,4 +32,20 @@ public class AuthService {
     var user = new UserResponse(8, request.getEmail());
     return new AuthResponse("Bearer", accessToken, refreshToken, user);
   }
+
+  public AuthResponse rotate(String refreshToken) throws InvalidCredentialsException {
+    var isAuthorized = jwtUtil.isRefreshToken(refreshToken);
+
+    if (!isAuthorized) {
+      throw new InvalidCredentialsException();
+    }
+
+    var userEmail = jwtUtil.getSubject(refreshToken);
+
+    var newAccessToken = jwtUtil.generateAccessToken(userEmail);
+    var newRefreshToken = jwtUtil.generateRefreshToken(userEmail);
+
+    var user = new UserResponse(8, userEmail);
+    return new AuthResponse("Bearer", newAccessToken, newRefreshToken, user);
+  }
 }

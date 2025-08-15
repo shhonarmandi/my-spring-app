@@ -8,10 +8,7 @@ import com.example.demo.util.ResponseUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
@@ -27,6 +24,23 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody AuthRequest request) {
     var response = authService.login(request);
+
+    var refreshCookie =
+        ResponseCookie.from("refresh_token", response.getRefreshToken())
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("Strict")
+            .path("/v1/refresh")
+            .maxAge(Duration.ofDays(30))
+            .build();
+
+    return ResponseUtil.success(response, refreshCookie);
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<ApiResponse<AuthResponse>> refresh(
+      @CookieValue(name = "refresh_token") String refreshToken) {
+    var response = authService.rotate(refreshToken);
 
     var refreshCookie =
         ResponseCookie.from("refresh_token", response.getRefreshToken())
