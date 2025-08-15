@@ -1,7 +1,7 @@
 package com.example.demo.service.v1;
 
-import com.example.demo.dto.v1.Auth.LoginRequest;
 import com.example.demo.dto.v1.Auth.AuthResponse;
+import com.example.demo.dto.v1.Auth.LoginRequest;
 import com.example.demo.dto.v1.User.UserResponse;
 import com.example.demo.exception.InvalidCredentialsException;
 import com.example.demo.util.JwtUtil;
@@ -23,7 +23,7 @@ public class AuthService {
             && request.getPassword().equals(hardcodedPassword);
 
     if (!isAuthorized) {
-      throw new InvalidCredentialsException();
+      throw InvalidCredentialsException.forHeaderEmailAndPassword();
     }
 
     var accessToken = jwtUtil.generateAccessToken(request.getEmail());
@@ -34,18 +34,16 @@ public class AuthService {
   }
 
   public AuthResponse rotate(String refreshToken) throws InvalidCredentialsException {
-    var isAuthorized = jwtUtil.isRefreshToken(refreshToken);
+    try {
+      var userEmail = jwtUtil.getRefreshTokenSubject(refreshToken);
 
-    if (!isAuthorized) {
-      throw new InvalidCredentialsException();
+      var newAccessToken = jwtUtil.generateAccessToken(userEmail);
+      var newRefreshToken = jwtUtil.generateRefreshToken(userEmail);
+
+      var user = new UserResponse(8, userEmail);
+      return new AuthResponse("Bearer", newAccessToken, newRefreshToken, user);
+    } catch (Exception e) {
+      throw InvalidCredentialsException.forCookieToken("refresh_token");
     }
-
-    var userEmail = jwtUtil.getSubject(refreshToken);
-
-    var newAccessToken = jwtUtil.generateAccessToken(userEmail);
-    var newRefreshToken = jwtUtil.generateRefreshToken(userEmail);
-
-    var user = new UserResponse(8, userEmail);
-    return new AuthResponse("Bearer", newAccessToken, newRefreshToken, user);
   }
 }

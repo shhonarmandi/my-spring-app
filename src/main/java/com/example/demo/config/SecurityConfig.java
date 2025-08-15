@@ -3,6 +3,7 @@ package com.example.demo.config;
 import com.example.demo.security.JwtAuthenticationFilter;
 import com.example.demo.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.Instant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,8 +11,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.time.Instant;
 
 @Configuration
 public class SecurityConfig {
@@ -65,6 +64,7 @@ public class SecurityConfig {
     return http.build();
   }
 
+  // TODO: improve to be based on ResponseUtils payload
   private String generateErrorResponse(String message) {
     return "{\"status\":\"error\",\"message\":\""
         + message

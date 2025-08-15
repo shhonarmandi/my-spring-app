@@ -1,6 +1,7 @@
 package com.example.demo.util;
 
 import com.example.demo.exception.InvalidCredentialsException;
+import com.example.demo.exception.TokenValidationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -19,17 +20,32 @@ public class JwtUtil {
   private final Duration accessTokenTtl = Duration.ofMinutes(15);
   private final Duration refreshTokenTtl = Duration.ofDays(30);
 
-  public String validateAndGetSubject(String token) {
-    return parseSignedClaims(token).getSubject();
+  public String getRefreshTokenSubject(String token) throws TokenValidationException {
+    try {
+      var parsedToken = parseSignedClaims(token);
+      var tokenType = parsedToken.get("token_type", String.class);
+      if (tokenType.equals("refresh")) {
+        return parsedToken.getSubject();
+      } else {
+        throw new TokenValidationException();
+      }
+    } catch (Exception e) {
+      throw new TokenValidationException();
+    }
   }
 
-  public boolean isRefreshToken(String token) {
-    var tokenType = parseSignedClaims(token).get("token_type", String.class);
-    return "refresh".equals(tokenType);
-  }
-
-  public String getSubject(String token) {
-    return parseSignedClaims(token).getSubject();
+  public String getAccessTokenSubject(String token) throws TokenValidationException {
+    try {
+      var parsedToken = parseSignedClaims(token);
+      var tokenType = parsedToken.get("token_type", String.class);
+      if (tokenType.equals("access")) {
+        return parsedToken.getSubject();
+      } else {
+        throw new TokenValidationException();
+      }
+    } catch (Exception e) {
+      throw new TokenValidationException();
+    }
   }
 
   public String generateAccessToken(String subject) {
@@ -54,11 +70,7 @@ public class JwtUtil {
         .compact();
   }
 
-  private Claims parseSignedClaims(String token) throws InvalidCredentialsException {
-    try {
-      return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
-    } catch (Exception e) {
-      throw new InvalidCredentialsException();
-    }
+  private Claims parseSignedClaims(String token) {
+    return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
   }
 }

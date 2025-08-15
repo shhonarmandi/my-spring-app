@@ -1,15 +1,14 @@
 package com.example.demo.controller.v1;
 
-import com.example.demo.dto.v1.Auth.LoginRequest;
 import com.example.demo.dto.v1.Auth.AuthResponse;
+import com.example.demo.dto.v1.Auth.LoginRequest;
 import com.example.demo.service.v1.AuthService;
 import com.example.demo.util.ResponseUtil;
 import jakarta.validation.Valid;
+import java.time.Duration;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.Duration;
 
 @RestController
 @RequestMapping("/v1")

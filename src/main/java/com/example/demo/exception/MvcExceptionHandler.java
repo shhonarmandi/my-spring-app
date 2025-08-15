@@ -4,18 +4,13 @@ import com.example.demo.dto.ApiErrorResponse;
 import com.example.demo.dto.Errors;
 import com.example.demo.dto.Target;
 import com.example.demo.util.ResponseUtil;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
-
-import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.MDC;
 import org.springframework.http.*;
-import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -23,22 +18,18 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 // TODO: make trace value dynamic
 @RestControllerAdvice
 public class MvcExceptionHandler {
-  // 400 status code - handled by Jakarta dependency
+  // 400 status code - body validation - handled by jakarta
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ApiErrorResponse> handleValidationErrors(
-      MethodArgumentNotValidException ex, HttpServletRequest request) {
-    // Map each field error to IBM-style Errors
+  public ResponseEntity<ApiErrorResponse> handleBodyValidation(MethodArgumentNotValidException ex) {
     List<Errors> list =
         ex.getBindingResult().getFieldErrors().stream()
             .map(
-                fe ->
+                fieldError ->
                     new Errors(
-                        mapValidationCode(fe.getCode()),
-                        // Prefer explicit message if provided; otherwise use a generic one.
-                        Optional.ofNullable(fe.getDefaultMessage()).orElse("Invalid value."),
-                        new Target("field", fe.getField())
-                        // Optional docs anchor per code; adjust base URL for your docs
-                        ))
+                        mapValidationCode(fieldError.getCode()),
+                        Optional.ofNullable(fieldError.getDefaultMessage())
+                            .orElse("Invalid value."),
+                        new Target("field", fieldError.getField())))
             .collect(Collectors.toList());
 
     ApiErrorResponse body = new ApiErrorResponse(list, "94f7f3e7a6e2");
@@ -46,12 +37,23 @@ public class MvcExceptionHandler {
     return ResponseUtil.error(HttpStatus.BAD_REQUEST, body);
   }
 
-  // 401 status code
-  @ExceptionHandler(InvalidCredentialsException.class)
-  public ResponseEntity<ApiErrorResponse> handleInvalidCredentials() {
+  // 400 status code - missing required cookie
+  @ExceptionHandler(MissingRequestCookieException.class)
+  public ResponseEntity<ApiErrorResponse> handleMissingCookie(MissingRequestCookieException ex) {
     var error =
         new Errors(
-            "invalid_token", "Authentication failed.", new Target("header", "Authorization"));
+            mapValidationCode("MissingRequestCookie"),
+            "Missing cookie '" + ex.getCookieName() + "'",
+            new Target("cookie", ex.getCookieName()));
+
+    ApiErrorResponse body = new ApiErrorResponse(List.of(error), "94f7f3e7a6e2");
+    return ResponseUtil.error(HttpStatus.BAD_REQUEST, body);
+  }
+
+  // 401 status code
+  @ExceptionHandler(InvalidCredentialsException.class)
+  public ResponseEntity<ApiErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex) {
+    var error = new Errors(ex.getCode(), ex.getDescription(), ex.getTarget());
 
     return ResponseUtil.error(
         HttpStatus.UNAUTHORIZED, new ApiErrorResponse(List.of(error), "94f7f3e7a6e2"));
