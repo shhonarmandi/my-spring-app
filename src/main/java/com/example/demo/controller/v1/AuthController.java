@@ -1,7 +1,6 @@
 package com.example.demo.controller.v1;
 
-import com.example.demo.dto.ApiResponse;
-import com.example.demo.dto.v1.Auth.AuthRequest;
+import com.example.demo.dto.v1.Auth.LoginRequest;
 import com.example.demo.dto.v1.Auth.AuthResponse;
 import com.example.demo.service.v1.AuthService;
 import com.example.demo.util.ResponseUtil;
@@ -22,7 +21,7 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody AuthRequest request) {
+  public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
     var response = authService.login(request);
 
     var refreshCookie =
@@ -37,8 +36,9 @@ public class AuthController {
     return ResponseUtil.success(response, refreshCookie);
   }
 
+  // TODO: what if cookie is not in the header
   @PostMapping("/refresh")
-  public ResponseEntity<ApiResponse<AuthResponse>> refresh(
+  public ResponseEntity<AuthResponse> refresh(
       @CookieValue(name = "refresh_token") String refreshToken) {
     var response = authService.rotate(refreshToken);
 

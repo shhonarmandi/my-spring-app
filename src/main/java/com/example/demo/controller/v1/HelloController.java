@@ -1,6 +1,5 @@
 package com.example.demo.controller.v1;
 
-import com.example.demo.dto.ApiResponse;
 import com.example.demo.dto.v1.User.HelloRequest;
 import com.example.demo.util.ResponseUtil;
 import jakarta.validation.Valid;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 class HelloController {
 
   @GetMapping("/hello")
-  public ResponseEntity<ApiResponse<Void>> hello(@Valid @ModelAttribute HelloRequest request) {
+  public ResponseEntity<Void> hello(@Valid @ModelAttribute HelloRequest request) {
     return ResponseUtil.success();
   }
 }

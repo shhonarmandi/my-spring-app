@@ -1,6 +1,6 @@
 package com.example.demo.service.v1;
 
-import com.example.demo.dto.v1.Auth.AuthRequest;
+import com.example.demo.dto.v1.Auth.LoginRequest;
 import com.example.demo.dto.v1.Auth.AuthResponse;
 import com.example.demo.dto.v1.User.UserResponse;
 import com.example.demo.exception.InvalidCredentialsException;
@@ -17,7 +17,7 @@ public class AuthService {
     this.jwtUtil = jwtUtil;
   }
 
-  public AuthResponse login(AuthRequest request) throws InvalidCredentialsException {
+  public AuthResponse login(LoginRequest request) throws InvalidCredentialsException {
     var isAuthorized =
         request.getEmail().equals(hardcodedEmail)
             && request.getPassword().equals(hardcodedPassword);

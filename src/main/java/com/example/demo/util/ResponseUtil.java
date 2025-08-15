@@ -1,41 +1,34 @@
 package com.example.demo.util;
 
-import com.example.demo.dto.ApiResponse;
+import com.example.demo.dto.ApiErrorResponse;
 import org.springframework.http.*;
 
 public class ResponseUtil {
-  public static <T> ResponseEntity<ApiResponse<T>> success() {
-    return ResponseEntity.ok(new ApiResponse<>("success", null));
+  public static ResponseEntity<Void> success() {
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
-  public static <T> ResponseEntity<ApiResponse<T>> success(T data) {
-    return ResponseEntity.ok(new ApiResponse<>("success", data));
+  public static <T> ResponseEntity<T> success(T data) {
+    return ResponseEntity.ok(data);
   }
 
-  public static <T> ResponseEntity<ApiResponse<T>> success(T data, ResponseCookie... cookies) {
+  public static <T> ResponseEntity<T> success(T data, ResponseCookie... cookies) {
     var builder = ResponseEntity.ok();
 
     for (var cookie : cookies) {
       builder.header(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
-    return builder.body(new ApiResponse<>("success", data));
+    return builder.body(data);
   }
 
-  public static <T> ResponseEntity<ApiResponse<T>> error(
-      HttpStatus status, String message, T data) {
-    return ResponseEntity.status(status).body(new ApiResponse<>("error", message, data, true));
+  public static ResponseEntity<ApiErrorResponse> error(
+      HttpStatus status, ApiErrorResponse payload) {
+    return ResponseEntity.status(status).body(payload);
   }
 
-  public static <T> ResponseEntity<ApiResponse<T>> error(HttpStatus status, String message) {
-    return ResponseEntity.status(status).body(new ApiResponse<>("error", message, null, true));
-  }
-
-  public static <T> ResponseEntity<ApiResponse<T>> error(HttpStatusCode status, String message) {
-    return ResponseEntity.status(status).body(new ApiResponse<>("error", message, null, true));
-  }
-
-  public static <T> ResponseEntity<ApiResponse<T>> error(String message) {
-    return error(HttpStatus.INTERNAL_SERVER_ERROR, message);
+  public static ResponseEntity<ApiErrorResponse> error(
+      HttpStatusCode status, ApiErrorResponse payload) {
+    return ResponseEntity.status(status).body(payload);
   }
 }
