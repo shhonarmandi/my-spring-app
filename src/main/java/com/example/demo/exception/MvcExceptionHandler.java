@@ -1,19 +1,23 @@
 package com.example.demo.exception;
 
-import com.example.demo.dto.ApiErrorResponse;
-import com.example.demo.dto.Errors;
-import com.example.demo.dto.Target;
-import com.example.demo.util.ResponseUtil;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.http.*;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import com.example.demo.dto.ApiErrorResponse;
+import com.example.demo.dto.Errors;
+import com.example.demo.dto.Target;
+import com.example.demo.util.ResponseUtil;
 
 // TODO: make trace value dynamic
 @RestControllerAdvice
@@ -69,13 +73,20 @@ public class MvcExceptionHandler {
         HttpStatus.NOT_FOUND, new ApiErrorResponse(List.of(error), "94f7f3e7a6e2"));
   }
 
-  // TODO: make message argument dynamic
   // 405 status code
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-  public ResponseEntity<ApiErrorResponse> handleMethodNotAllowed() {
-    var error =
-        new Errors(
-            "method_not_allowed", "Use GET for this endpoint.", new Target("method", "POST"));
+  public ResponseEntity<ApiErrorResponse> handleMethodNotAllowed(
+      HttpRequestMethodNotSupportedException ex) {
+    var message =
+        ex.getSupportedMethods() != null
+            ? "The HTTP method used is not allowed for this endpoint. Use: "
+                + Arrays.stream(ex.getSupportedMethods())
+                    .map(string -> "`" + string + "`")
+                    .collect(Collectors.joining(", "))
+                + "."
+            : null;
+
+    var error = new Errors("method_not_allowed", message, new Target("method", ex.getMethod()));
 
     return ResponseUtil.error(
         HttpStatus.METHOD_NOT_ALLOWED, new ApiErrorResponse(List.of(error), "94f7f3e7a6e2"));

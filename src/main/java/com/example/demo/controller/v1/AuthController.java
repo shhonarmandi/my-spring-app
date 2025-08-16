@@ -1,14 +1,17 @@
 package com.example.demo.controller.v1;
 
+import java.time.Duration;
+
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.example.demo.dto.v1.Auth.AuthResponse;
 import com.example.demo.dto.v1.Auth.LoginRequest;
 import com.example.demo.service.v1.AuthService;
 import com.example.demo.util.ResponseUtil;
+
 import jakarta.validation.Valid;
-import java.time.Duration;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1")
@@ -35,7 +38,6 @@ public class AuthController {
     return ResponseUtil.success(response, refreshCookie);
   }
 
-  // TODO: what if cookie is not in the header
   @PostMapping("/refresh")
   public ResponseEntity<AuthResponse> refresh(
       @CookieValue(name = "refresh_token") String refreshToken) {

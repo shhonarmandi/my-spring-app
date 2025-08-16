@@ -1,11 +1,12 @@
 package com.example.demo.service.v1;
 
+import org.springframework.stereotype.Service;
+
 import com.example.demo.dto.v1.Auth.AuthResponse;
 import com.example.demo.dto.v1.Auth.LoginRequest;
 import com.example.demo.dto.v1.User.UserResponse;
 import com.example.demo.exception.InvalidCredentialsException;
 import com.example.demo.util.JwtUtil;
-import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {

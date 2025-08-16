@@ -1,7 +1,8 @@
 package com.example.demo.util;
 
-import com.example.demo.dto.ApiErrorResponse;
 import org.springframework.http.*;
+
+import com.example.demo.dto.ApiErrorResponse;
 
 public class ResponseUtil {
   public static ResponseEntity<Void> success() {

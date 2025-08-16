@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "→ Running Spotless apply…"
+mvn -q -DskipTests spotless:apply
+
+# re-stage any changes Spotless made
+git add -A
+
+echo "→ Verifying formatting…"
+mvn -q -DskipTests spotless:check
