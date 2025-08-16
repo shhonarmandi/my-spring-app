@@ -93,10 +93,13 @@ public class MvcExceptionHandler {
   }
 
   // TODO: what if user enters an invalid json format
+  // TODO: what if user enters the wrong type for a property
+  // TODO: what if user enters additional wrong fields
+  // TODO: what if user enters a data that needs trim
   // 500 status code
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ApiErrorResponse> handleGenericException() {
-    var error = new Errors("internal_server_error", "Unexpected error.");
+  public ResponseEntity<ApiErrorResponse> handleGenericException(Exception ex) {
+    var error = new Errors("internal_server_error", ex.getMessage());
 
     return ResponseUtil.error(
         HttpStatus.INTERNAL_SERVER_ERROR, new ApiErrorResponse(List.of(error), "94f7f3e7a6e2"));
