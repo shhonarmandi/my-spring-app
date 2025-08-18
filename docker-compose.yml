@@ -30,5 +30,3 @@ services:
     volumes:
       - ./certbot/www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
-    entrypoint: [ "/bin/sh", "-c" ]
-    command: [ "trap 'exit' TERM INT; sleep infinity & wait" ]
