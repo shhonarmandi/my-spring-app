@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:latest"
     container_name: my-spring-app
     env_file: .env
     environment:
