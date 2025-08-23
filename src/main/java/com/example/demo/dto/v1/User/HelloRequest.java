@@ -6,9 +6,9 @@ import jakarta.validation.constraints.Size;
 public class HelloRequest {
   @NotBlank(message = "FirstName is required.")
   @Size(max = 50, message = "FirstName must be at most 50 characters.")
-  private String firstName;
+  private String name;
 
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
+  public void setName(String name) {
+    this.name = name;
   }
 }
