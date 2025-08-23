@@ -55,6 +55,7 @@ jobs:
             aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
 
             cd /home/${{ secrets.EC2_USER }}/my-spring-app
+            git fetch origin
             git reset --hard origin/main
             
             docker-compose pull
