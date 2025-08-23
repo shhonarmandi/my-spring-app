@@ -1,6 +1,7 @@
 services:
   my-spring-app:
     image: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${IMAGE_TAG}"
+    container_name: my-spring-app
     env_file: .env
     environment:
       SERVER_FORWARD_HEADERS_STRATEGY: native
